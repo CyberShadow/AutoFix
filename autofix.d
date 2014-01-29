@@ -52,6 +52,9 @@ string process(string file, string id)
 	auto lines = file.readText().splitLines();
 	foreach (i, line; lines)
 	{
+		enum BOM = "\uFEFF";
+		if (line.startsWith(BOM))
+			line = line[BOM.length..$];
 		if (moduleLine<0 && line.startsWith("module "))
 			moduleLine = i;
 		else
