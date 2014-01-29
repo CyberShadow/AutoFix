@@ -7,6 +7,7 @@ import ae.utils.json;
 
 enum JsonFiles =
 [
+	`C:\Projects\Extern\D\druntime\druntime.json`,
 	`C:\Projects\Extern\D\phobos\phobos.json`,
 	`C:\Projects\ae\ae.json`,
 	`C:\Projects\Extern\dsource-bindings\bindings.json`,
