@@ -103,7 +103,8 @@ moduleLoop:
 		void addImport(int line, string prefix=null, string postfix=null)
 		{
 			goTo(line);
-			insertText(prefix ~ "import " ~ mod ~ " : " ~ id ~ ";\n" ~ postfix);
+			//insertText(prefix ~ "import " ~ mod ~ " : " ~ id ~ ";\n" ~ postfix);
+			insertText(prefix ~ "import " ~ mod ~ ";\n" ~ postfix);
 		}
 
 		if (lastImportLine >= 0)
