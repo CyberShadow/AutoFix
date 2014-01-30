@@ -46,36 +46,39 @@ string process(string file, string id)
 		return null;
 	string[] mods = summary[id];
 
-	int moduleLine=-1, firstImportLine=-1, lastImportLine=-1;
-	bool inImport;
-
-	auto lines = file.readText().splitLines();
-	foreach (i, line; lines)
-	{
-		enum BOM = "\uFEFF";
-		if (line.startsWith(BOM))
-			line = line[BOM.length..$];
-		if (moduleLine<0 && line.startsWith("module "))
-			moduleLine = i;
-		else
-		if (firstImportLine<0 && line.startsWith("import "))
-		{
-			firstImportLine = lastImportLine = i;
-			inImport = true;
-		}
-		else
-		if (inImport && line.startsWith("import "))
-			lastImportLine = i;
-		else
-		if (inImport && line == "")
-			inImport = false;
-	}
-
 	string[string][][string] result;
 
 moduleLoop:
 	foreach (mod; mods)
 	{
+		auto modPackage = mod.indexOf(".") >= 0 ? mod.split(".")[0] : null;
+		auto importLinePrefix = "import " ~ modPackage;
+
+		int moduleLine=-1, firstImportLine=-1, lastImportLine=-1;
+		bool inImport;
+
+		auto lines = file.readText().splitLines();
+		foreach (i, line; lines)
+		{
+			enum BOM = "\uFEFF";
+			if (line.startsWith(BOM))
+				line = line[BOM.length..$];
+			if (moduleLine<0 && line.startsWith("module "))
+				moduleLine = i;
+			else
+			if (firstImportLine<0 && line.startsWith(importLinePrefix))
+			{
+				firstImportLine = lastImportLine = i;
+				inImport = true;
+			}
+			else
+			if (inImport && line.startsWith(importLinePrefix))
+				lastImportLine = i;
+			else
+			if (inImport && line == "")
+				inImport = false;
+		}
+
 		string[string][] commands;
 
 		void goTo(int line, int col=0)
