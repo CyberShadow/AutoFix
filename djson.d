@@ -71,6 +71,9 @@ void rebuildSummary(string summaryFileName)
 		string alias_;
 	@JSONName("align")
 		uint align_;
+		string specAlias;
+		string value;
+		string constraint;
 	}
 
 	bool[string][string] summary;
