@@ -11,6 +11,7 @@ enum JsonFiles =
 	`C:\Projects\Extern\D\phobos\phobos.json`,
 	`C:\Projects\ae\ae.json`,
 	`C:\Projects\Extern\dsource-bindings\bindings.json`,
+	`C:\Projects\team15\team15.json`,
 ];
 
 string[][string] getJsonSummary()
