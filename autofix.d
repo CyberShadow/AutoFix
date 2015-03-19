@@ -58,7 +58,7 @@ moduleLoop:
 		bool inImport;
 
 		auto lines = file.readText().splitLines();
-		foreach (i, line; lines)
+		foreach (int i, line; lines)
 		{
 			enum BOM = "\uFEFF";
 			if (line.startsWith(BOM))
@@ -123,7 +123,7 @@ moduleLoop:
 				if (line.startsWith(importLine) && line.length > importLine.length && !isAlphaNum(line[importLine.length]))
 				{
 					// Add to existing import.
-					auto p = line.indexOf(";");
+					auto p = cast(int)line.indexOf(";");
 					if (p < 0)
 						continue;
 					auto c = line.indexOf(":");
