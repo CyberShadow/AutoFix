@@ -14,6 +14,11 @@ enum JsonFiles =
 	`C:\Projects\team15\team15.json`,
 ];
 
+enum ManualFiles =
+[
+	`C:\Projects\Extern\dsource-bindings\bindings-handles.json`,
+];
+
 string[][string] getJsonSummary()
 {
 	static string[][string] jsonSummary;
@@ -21,7 +26,8 @@ string[][string] getJsonSummary()
 	{
 		string summaryFileName = thisExePath.dirName.buildPath("summary.json");
 		if (!summaryFileName.exists
-		 || JsonFiles.chain(thisExePath.only).any!(f => f.timeLastModified > summaryFileName.timeLastModified))
+		 || chain(JsonFiles, ManualFiles, thisExePath.only)
+			.any!(f => f.timeLastModified > summaryFileName.timeLastModified))
 		{
 			// summary is stale, rebuild
 			rebuildSummary(summaryFileName);
@@ -99,6 +105,14 @@ void rebuildSummary(string summaryFileName)
 				summary[d.name][m.name] = true;
 			}
 		}
+	}
+
+	foreach (fn; ManualFiles)
+	{
+		auto dict = fn.readText.jsonParse!(string[string]);
+		foreach (sym, mod; dict)
+			if (sym.length && mod.length)
+				summary[sym][mod] = true;
 	}
 
 	string[][string] result;
