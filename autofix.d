@@ -9,12 +9,12 @@ import ae.utils.json;
 
 import djson;
 
-enum FN = `C:\Temp\colorout.json`;
+//enum FN = `C:\Temp\colorout.json`;
 
 void main()
 {
 	string[string][] entries;
-	foreach (line; File(FN).byLine)
+	foreach (line; stdin.byLine)
 		entries ~= line.chomp.jsonParse!(string[string]);
 
 	bool dirty;
@@ -31,12 +31,8 @@ void main()
 		}
 	}
 
-	if (dirty)
-	{
-		auto f = File(FN, "wb");
-		foreach (entry; entries)
-			f.writeln(entry.toJson);
-	}
+	foreach (entry; entries)
+		writeln(entry.toJson);
 }
 
 string process(string file, string id)

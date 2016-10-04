@@ -7,16 +7,16 @@ import ae.utils.json;
 
 enum JsonFiles =
 [
-	`C:\Projects\Extern\D\druntime\druntime.json`,
-	`C:\Projects\Extern\D\phobos\phobos.json`,
-	`C:\Projects\ae\ae.json`,
-	`C:\Projects\Extern\dsource-bindings\bindings.json`,
-	`C:\Projects\team15\team15.json`,
+	`/home/vladimir/work/extern/D/druntime/druntime.json`,
+	`/home/vladimir/work/extern/D/phobos/phobos.json`,
+	`/home/vladimir/work/ae/ae.json`,
+//	`/home/vladimir/work/extern/dsource-bindings/bindings.json`,
+	`/home/vladimir/work/team15/team15.json`,
 ];
 
-enum ManualFiles =
+enum string[] ManualFiles =
 [
-	`C:\Projects\Extern\dsource-bindings\bindings-handles.json`,
+//	`/home/vladimir/work/extern/dsource-bindings/bindings-handles.json`,
 ];
 
 string[][string] getJsonSummary()
