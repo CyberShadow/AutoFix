@@ -1,3 +1,4 @@
+import std.algorithm.mutation;
 import std.conv;
 import std.file;
 import std.regex;
@@ -6,6 +7,7 @@ import std.string;
 import std.ascii;
 
 import ae.utils.json;
+import ae.utils.text;
 
 import djson;
 
@@ -35,14 +37,84 @@ void main()
 		writeln(entry.toJson);
 }
 
+struct Editor
+{
+	string[string][] commands;
+
+	void goTo(size_t line, size_t col=0)
+	{
+		commands ~= [
+			"command" : "goto",
+			"line" : (line+1).text,
+			"char" : (col+1).text,
+		];
+	}
+
+	void insertText(string text)
+	{
+		commands ~= [
+			"command" : "insert",
+			"text" : text,
+		];
+	}
+
+	void deleteText(size_t count)
+	{
+		commands ~= [
+			"command" : "delete",
+			"count" : count.text,
+		];
+	}
+
+	void ret(int offset)
+	{
+		commands ~= [
+			"command" : "return",
+			"offset" : offset.text,
+		];
+	}
+
+	void addImport(string mod, int line, string prefix=null, string postfix=null)
+	{
+		goTo(line);
+		//insertText(prefix ~ "import " ~ mod ~ " : " ~ id ~ ";\n" ~ postfix);
+		insertText(prefix ~ "import " ~ mod ~ ";\n" ~ postfix);
+	}
+}
+
 string process(string file, string id)
 {
+	string origId = id;
 	auto summary = getJsonSummary();
-	if (id !in summary)
-		return null;
-	string[] mods = summary[id];
-
 	string[string][][string] result;
+
+	if (id !in summary)
+	{
+		auto knownIds = summary.keys;
+		auto index = findBestMatch(knownIds, id, 0.3);
+		if (index < 0)
+			return null;
+		id = knownIds[index];
+
+		string[string][][] edits;
+
+		auto re = regex(`\b` ~ escapeRE(origId) ~ `\b`);
+		auto lines = file.readText().splitLines();
+		foreach (int i, line; lines)
+			foreach (c; matchAll(line, re))
+			{
+				Editor editor;
+				editor.goTo(i, c.pre.length);
+				editor.deleteText(origId.length);
+				editor.insertText(id);
+				edits ~= editor.commands;
+			}
+		edits.reverse();
+		edits ~= { Editor ed; ed.ret(0); return ed.commands; }();
+		result["Correct to " ~ id] = edits.join();
+		return result.toJson();
+	}
+	string[] mods = summary[id];
 
 moduleLoop:
 	foreach (mod; mods)
@@ -75,39 +147,7 @@ moduleLoop:
 				inImport = false;
 		}
 
-		string[string][] commands;
-
-		void goTo(int line, int col=0)
-		{
-			commands ~= [
-				"command" : "goto",
-				"line" : (line+1).text,
-				"char" : (col+1).text,
-			];
-		}
-
-		void insertText(string text)
-		{
-			commands ~= [
-				"command" : "insert",
-				"text" : text,
-			];
-		}
-
-		void ret(int offset)
-		{
-			commands ~= [
-				"command" : "return",
-				"offset" : offset.text,
-			];
-		}
-
-		void addImport(int line, string prefix=null, string postfix=null)
-		{
-			goTo(line);
-			//insertText(prefix ~ "import " ~ mod ~ " : " ~ id ~ ";\n" ~ postfix);
-			insertText(prefix ~ "import " ~ mod ~ ";\n" ~ postfix);
-		}
+		Editor editor;
 
 		if (lastImportLine >= 0)
 		{
@@ -124,13 +164,13 @@ moduleLoop:
 						continue;
 					auto c = line.indexOf(":");
 					bool haveColon = c>0 && c<p;
-					goTo(n, p);
+					editor.goTo(n, p);
 					if (haveColon)
-						insertText(", " ~ id);
+						editor.insertText(", " ~ id);
 					else
-						insertText(" : " ~ id);	
-					ret(0);
-					result["Import " ~ id ~ " from " ~ mod] = commands;
+						editor.insertText(" : " ~ id);	
+					editor.ret(0);
+					result["Import " ~ id ~ " from " ~ mod] = editor.commands;
 					continue moduleLoop;
 				}
 				else
@@ -139,22 +179,22 @@ moduleLoop:
 			}
 
 			// Existing import not found, insert one
-			addImport(n);
-			ret(1);
+			editor.addImport(mod, n);
+			editor.ret(1);
 		}
 		else
 		if (moduleLine >= 0) // add first import, after "module" statement
 		{
-			addImport(moduleLine+1, "\n");
-			ret(2);
+			editor.addImport(mod, moduleLine+1, "\n");
+			editor.ret(2);
 		}
 		else // add first import, at the top of the program
 		{
-			addImport(0, null, "\n");
-			ret(2);
+			editor.addImport(mod, 0, null, "\n");
+			editor.ret(2);
 		}
 
-		result["Import " ~ mod] = commands;
+		result["Import " ~ mod] = editor.commands;
 	}
 	return result.toJson();
 }
