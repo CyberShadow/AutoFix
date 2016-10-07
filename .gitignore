@@ -1,3 +1,5 @@
 *.exe
 summary.json
 /dautofix
+/json-files.txt
+/manual-files.txt

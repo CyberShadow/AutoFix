@@ -2,22 +2,17 @@ import std.range;
 import std.algorithm;
 import std.file;
 import std.path;
+import std.string;
 
 import ae.utils.json;
 
-enum JsonFiles =
-[
-	`/home/vladimir/work/extern/D/druntime/druntime.json`,
-	`/home/vladimir/work/extern/D/phobos/phobos.json`,
-	`/home/vladimir/work/ae/ae.json`,
-//	`/home/vladimir/work/extern/dsource-bindings/bindings.json`,
-	`/home/vladimir/work/team15/team15.json`,
-];
+string[] jsonFiles, manualFiles;
 
-enum string[] ManualFiles =
-[
-//	`/home/vladimir/work/extern/dsource-bindings/bindings-handles.json`,
-];
+static this()
+{
+	jsonFiles   = thisExePath.dirName.buildPath("json-files.txt"  ).readText().splitLines();
+	manualFiles = thisExePath.dirName.buildPath("manual-files.txt").readText().splitLines();
+}
 
 string[][string] getJsonSummary()
 {
@@ -26,7 +21,7 @@ string[][string] getJsonSummary()
 	{
 		string summaryFileName = thisExePath.dirName.buildPath("summary.json");
 		if (!summaryFileName.exists
-		 || chain(JsonFiles, ManualFiles, thisExePath.only)
+		 || chain(jsonFiles, manualFiles, thisExePath.only)
 			.any!(f => f.timeLastModified > summaryFileName.timeLastModified))
 		{
 			// summary is stale, rebuild
@@ -85,7 +80,7 @@ void rebuildSummary(string summaryFileName)
 
 	bool[string][string] summary;
 
-	foreach (fn; JsonFiles)
+	foreach (fn; jsonFiles)
 	{
 		auto modules = fn.readText.jsonParse!(Member[]);
 		foreach (m; modules)
@@ -107,7 +102,7 @@ void rebuildSummary(string summaryFileName)
 		}
 	}
 
-	foreach (fn; ManualFiles)
+	foreach (fn; manualFiles)
 	{
 		auto dict = fn.readText.jsonParse!(string[string]);
 		foreach (sym, mod; dict)
