@@ -10,8 +10,20 @@ string[] jsonFiles, manualFiles;
 
 static this()
 {
-	jsonFiles   = thisExePath.dirName.buildPath("json-files.txt"  ).readText().splitLines();
-	manualFiles = thisExePath.dirName.buildPath("manual-files.txt").readText().splitLines();
+	static string[] loadFileList(string fn)
+	{
+		return thisExePath
+			.dirName
+			.buildPath(fn)
+			.readText()
+			.splitLines()
+			.filter!(line => !line.startsWith('#'))
+			.array()
+		;
+	}
+
+	jsonFiles   = loadFileList("json-files.txt");
+	manualFiles = loadFileList("manual-files.txt");
 }
 
 string[][string] getJsonSummary()
