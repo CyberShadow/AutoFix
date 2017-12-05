@@ -4,7 +4,9 @@ import std.file;
 import std.path;
 import std.string;
 
+import ae.sys.paths;
 import ae.utils.json;
+import ae.utils.path;
 
 string[] jsonFiles, manualFiles;
 
@@ -12,9 +14,14 @@ static this()
 {
 	static string[] loadFileList(string fn)
 	{
-		return thisExePath
-			.dirName
-			.buildPath(fn)
+		return
+			[
+				thisExePath.dirName.buildPath(fn),
+				getConfigDir("dautofix").buildPath(fn),
+				nullFileName,
+			]
+			.filter!exists
+			.front
 			.readText()
 			.splitLines()
 			.filter!(line => !line.startsWith('#'))
