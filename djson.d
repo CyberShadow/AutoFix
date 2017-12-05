@@ -41,6 +41,7 @@ string[][string] getJsonSummary()
 		string summaryFileName = thisExePath.dirName.buildPath("summary.json");
 		if (!summaryFileName.exists
 		 || chain(jsonFiles, manualFiles, thisExePath.only)
+			.filter!(f => f.exists)
 			.any!(f => f.timeLastModified > summaryFileName.timeLastModified))
 		{
 			// summary is stale, rebuild
@@ -101,6 +102,8 @@ void rebuildSummary(string summaryFileName)
 
 	foreach (fn; jsonFiles)
 	{
+		if (!fn.exists)
+			continue;
 		auto modules = fn.readText.jsonParse!(Member[]);
 		foreach (m; modules)
 		{
@@ -123,6 +126,8 @@ void rebuildSummary(string summaryFileName)
 
 	foreach (fn; manualFiles)
 	{
+		if (!fn.exists)
+			continue;
 		auto dict = fn.readText.jsonParse!(string[string]);
 		foreach (sym, mod; dict)
 			if (sym.length && mod.length)
