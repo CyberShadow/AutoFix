@@ -7,6 +7,7 @@ import std.string;
 import std.ascii;
 
 import ae.utils.json;
+import ae.utils.regex;
 import ae.utils.text;
 
 import djson;
