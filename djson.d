@@ -56,6 +56,7 @@ string[][string] getJsonSummary()
 
 void rebuildSummary(string summaryFileName)
 {
+	@JSONPartial
 	struct Member
 	{
 		string file, name, kind;
