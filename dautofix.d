@@ -7,6 +7,7 @@ import std.string;
 import std.ascii;
 
 import ae.utils.json;
+import ae.utils.meta : I;
 import ae.utils.regex;
 import ae.utils.text;
 
@@ -157,7 +158,7 @@ moduleLoop:
 			for (n = firstImportLine; n <= lastImportLine; n++)
 			{
 				auto line = lines[n];
-				if (line.startsWith(importLine) && line.length > importLine.length && !isAlphaNum(line[importLine.length]))
+				if (line.startsWith(importLine) && line.length > importLine.length && !line[importLine.length].I!(c => c.isAlphaNum() || c == '.'))
 				{
 					// Add to existing import.
 					auto p = cast(int)line.indexOf(";");
