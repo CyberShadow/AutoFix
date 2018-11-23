@@ -62,7 +62,7 @@ if next(items) == nil then return end
 local answer = far.Menu({Title="Compilation result"}, items)
 if not answer then return end
 
-function goto(file, line, column, title)
+function goTo(file, line, column, title)
   Keys("ShiftF4")
   print(file)
   Keys("Enter")
@@ -91,7 +91,7 @@ if answer.fixes then
   if not item then return end
   for i, cmd in ipairs(item.cmd) do
     if cmd.command == "goto" then
-      goto(answer.file, cmd.line, cmd.char, nil)
+      goTo(answer.file, cmd.line, cmd.char, nil)
     elseif cmd.command == "insert" then
       print(cmd.text)
     elseif cmd.command == "return" then
@@ -110,5 +110,5 @@ if answer.fixes then
     end
   end
 else
-  goto(answer.file, answer.line, answer.column, answer.text)
+  goTo(answer.file, answer.line, answer.column, answer.text)
 end
