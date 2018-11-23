@@ -5,9 +5,9 @@ win.DeleteFile(fn)
 
 local editorfn = editor.GetFileName(nil)
 
-Keys("CtrlF10 F2")
-if Area.Dialog then return end
-Keys("F12 1")
+Keys("CtrlF10 F2") -- Focus on file; save
+if Area.Dialog then return end -- Error or "Enter file name" prompt
+Keys("F12 1") -- Switch windows
 if not Area.Shell then return end
 
 local item = panel.GetCurrentPanelItem(nil, 1)
