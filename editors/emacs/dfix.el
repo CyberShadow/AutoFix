@@ -163,4 +163,4 @@
 	(error "Unrecognized error at point"))
     (d-fix-id (symbol-at-point))))
 
-(provide 'cs/dfix)
+(provide 'dfix)
