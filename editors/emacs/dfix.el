@@ -160,7 +160,7 @@
   (if-let ((errors (flycheck-overlay-errors-at (point))))
       (unless (cl-loop for err in errors
 		       thereis (d-fix-handle-error-message (flycheck-error-message err)))
-	(error "Unrecognized error at point"))
+	(user-error "Unrecognized error at point"))
     (d-fix-id (symbol-at-point))))
 
 (provide 'dfix)
