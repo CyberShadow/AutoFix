@@ -102,7 +102,7 @@
 	   (any "'`")
 	   (group (one-or-more (or (syntax word) (syntax symbol))))
 	   (any "'`")
-	   " for type ")
+	   " for ")
        (rx "template instance "
 	   (one-or-more any)
 	   " template "
