@@ -54,6 +54,24 @@ string[][string] getJsonSummary()
 	return jsonSummary;
 }
 
+int modulePriority(string mod)
+{
+	int prio = 0;
+
+	// avoid hits in internal modules
+	if (mod.canFind("internal"))
+		prio -= 10;
+
+	// prefer users' modules over Druntime/Phobos,
+	// and prefer Phobos over Druntime (e.g. for `array`, `stdin`...)
+	if (mod.startsWith("core."))
+		prio -= 2;
+	if (mod.startsWith("std."))
+		prio -= 1;
+
+	return prio;
+}
+
 void rebuildSummary(string summaryFileName)
 {
 	@JSONPartial
@@ -137,7 +155,10 @@ void rebuildSummary(string summaryFileName)
 
 	string[][string] result;
 	foreach (sym, mods; summary)
-			result[sym] = mods.keys;
+		result[sym] = mods.keys.multiSort!(
+			(a, b) => modulePriority(a) > modulePriority(b),
+			(a, b) => a < b,
+		).release;
 
 	std.file.write(summaryFileName, result.toJson);
 }

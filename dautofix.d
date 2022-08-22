@@ -6,6 +6,7 @@ import std.stdio;
 import std.string;
 import std.ascii;
 
+import ae.utils.aa;
 import ae.utils.json;
 import ae.utils.meta : I;
 import ae.utils.regex;
@@ -90,7 +91,7 @@ string process(string file, string id)
 {
 	string origId = id;
 	auto summary = getJsonSummary();
-	string[string][][string] result;
+	OrderedMap!(string, string[string][]) result;
 
 	if (id !in summary)
 	{
