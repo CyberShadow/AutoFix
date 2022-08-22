@@ -39,11 +39,13 @@ void main()
 		writeln(entry.toJson);
 }
 
+alias LineNumber = sizediff_t;
+
 struct Editor
 {
 	string[string][] commands;
 
-	void goTo(size_t line, size_t col=0)
+	void goTo(LineNumber line, size_t col=0)
 	{
 		commands ~= [
 			"command" : "goto",
@@ -76,7 +78,7 @@ struct Editor
 		];
 	}
 
-	void addImport(string mod, int line, string prefix=null, string postfix=null)
+	void addImport(string mod, LineNumber line, string prefix=null, string postfix=null)
 	{
 		goTo(line);
 		//insertText(prefix ~ "import " ~ mod ~ " : " ~ id ~ ";\n" ~ postfix);
@@ -102,7 +104,7 @@ string process(string file, string id)
 
 		auto re = regex(`\b` ~ escapeRE(origId) ~ `\b`);
 		auto lines = file.readText().splitLines();
-		foreach (int i, line; lines)
+		foreach (LineNumber i, line; lines)
 			foreach (c; matchAll(line, re))
 			{
 				Editor editor;
@@ -124,11 +126,11 @@ moduleLoop:
 		auto modPackage = mod.indexOf(".") >= 0 ? mod.split(".")[0] : null;
 		auto importLinePrefix = "import " ~ modPackage;
 
-		int moduleLine=-1, firstImportLine=-1, lastImportLine=-1;
+		LineNumber moduleLine=-1, firstImportLine=-1, lastImportLine=-1;
 		bool inImport;
 
 		auto lines = file.readText().splitLines();
-		foreach (int i, line; lines)
+		foreach (LineNumber i, line; lines)
 		{
 			enum BOM = "\uFEFF";
 			if (line.startsWith(BOM))
@@ -154,7 +156,7 @@ moduleLoop:
 		if (lastImportLine >= 0)
 		{
 			auto importLine = "import " ~ mod;
-			int n;
+			LineNumber n;
 			for (n = firstImportLine; n <= lastImportLine; n++)
 			{
 				auto line = lines[n];
