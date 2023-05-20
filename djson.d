@@ -58,6 +58,10 @@ int modulePriority(string mod)
 {
 	int prio = 0;
 
+	// ae modules with alternative APIs
+	if (mod == "ae.sys.vfs")
+		prio -= 20;
+
 	// avoid hits in internal modules
 	if (mod.canFind("internal"))
 		prio -= 10;
@@ -68,6 +72,10 @@ int modulePriority(string mod)
 		prio -= 2;
 	if (mod.startsWith("std."))
 		prio -= 1;
+
+	// prefer std.string over std.algorithm where applicable
+	if (mod == "std.string")
+		prio += 1;
 
 	return prio;
 }
