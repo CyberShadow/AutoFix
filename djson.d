@@ -61,6 +61,16 @@ int modulePriority(string mod)
 	// ae modules with alternative APIs
 	if (mod == "ae.sys.vfs")
 		prio -= 20;
+	if (mod == "ae.utils.functor.algorithm")
+		prio -= 20;
+	if (mod == "ae.utils.typecons")
+		prio -= 10;
+
+	// Phobos modules with alternative APIs
+	if (mod == "std.complex")
+		prio -= 20;
+	if (mod == "std.checkedint")
+		prio -= 20;
 
 	// avoid hits in internal modules
 	if (mod.canFind("internal"))
