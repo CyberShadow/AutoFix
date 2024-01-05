@@ -65,6 +65,8 @@ int modulePriority(string mod)
 		prio -= 20;
 	if (mod == "ae.utils.typecons")
 		prio -= 10;
+	if (mod == "ae.utils.graphics.view") // parallel
+		prio -= 10;
 
 	// Phobos modules with alternative APIs
 	if (mod == "std.complex")
